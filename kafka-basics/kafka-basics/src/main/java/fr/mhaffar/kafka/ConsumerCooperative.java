@@ -2,6 +2,7 @@ package fr.mhaffar.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.CooperativeStickyAssignor;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -12,8 +13,8 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
 
-public class ConsumerWithShutdown {
-    private static final Logger log = LoggerFactory.getLogger(ConsumerWithShutdown.class.getSimpleName());
+public class ConsumerCooperative {
+    private static final Logger log = LoggerFactory.getLogger(ConsumerCooperative.class.getSimpleName());
 
     public static void main(String[] args) {
 
@@ -35,6 +36,8 @@ public class ConsumerWithShutdown {
         props.setProperty("value.deserializer", StringDeserializer.class.getName());
         props.setProperty("group.id", groupId);
         props.setProperty("auto.offset.reset", "earliest");
+        props.setProperty("partition.assignment.strategy", CooperativeStickyAssignor.class.getName());
+        // props.setProperty("group.instance.id", "...."); // Strategy for static assignments
 
         //create a consumer
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
@@ -68,7 +71,7 @@ public class ConsumerWithShutdown {
             //poll for data
             while (true) {
 
-                log.info("Consuming from topic: " + topic);
+                // log.info("Consuming from topic: " + topic);
 
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
 
